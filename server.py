@@ -1,11 +1,11 @@
 import socket
 import secrets
-import sys
-from Crypto.Cipher import AES
+from aes import AES
+import crypto
 
 #K' and IV
-k_ = '\xe3N\x90x\x1f\xde\xaa4\xb7\xd2@b\xf9\x1b\xf2l'
-initialization_vector = '0102030405060708'
+k_ = b'7766554433221100'
+initialization_vector = b'0102030405060708'
 
 
 def generate_random_key():
@@ -13,7 +13,6 @@ def generate_random_key():
 
 
 def main():
-
     server = socket.socket()
     port = 7777
     server.bind(('', port))
@@ -34,8 +33,9 @@ def main():
     # crypt key for A
     k = generate_random_key()
     print(f'Key generated : {k}')
-    aes = AES.new(k_.encode('utf-8'), AES.MODE_CBC, initialization_vector.encode('utf-8'))
-    enc_key = aes.encrypt(k)
+
+    aes = AES(k_) 
+    enc_key = crypto.encrypt_cfb(aes, k, initialization_vector)
     print(f'Encrypted key = {enc_key}')
 
 
@@ -53,7 +53,7 @@ def main():
 
     # receive messages from A and send it to B
     while True:
-        message_for_b = client_a.recv(128)
+        message_for_b = client_a.recv(16)
         client_b.send(message_for_b)
 
 
