@@ -6,7 +6,8 @@ import crypto
 
 def main():
     s = socket.socket()
-    operation_mode = 'CFB'
+    # operation_mode = 'CFB'
+    operation_mode = 'ECB'
     # k' and IV
     key = b'7766554433221100'
     initialization_vector = b'0102030405060708'
@@ -41,10 +42,14 @@ def main():
     with open("secret.txt", "r") as f:
         message = f.read(1024)
         aes = AES(dec_key)
+        blocks = [message[i:i+16] for i in range(0, len(message), 16)]
         if operation_mode == 'ECB':
-            pass
+            for block in blocks:
+                encrypted_message = crypto.encrypt_ecb(aes, bytes(block, 'utf-8'))
+                s.send(encrypted_message)
+                print(f'Message : {block}')
+                print(f'(CFB) Message sent: {encrypted_message}')
         else: # CFB
-            blocks = [message[i:i+16] for i in range(0, len(message), 16)]
             for block in blocks:
                 encrypted_message = crypto.encrypt_cfb(aes, bytes(block, 'utf-8'), initialization_vector)
                 s.send(encrypted_message)

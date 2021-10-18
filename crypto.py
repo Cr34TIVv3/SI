@@ -20,12 +20,30 @@ def encrypt_cfb(aes_, plaintext, iv):
     return b''.join(blocks)
 
 
+def encrypt_ecb(aes_, plaintext):
+    blocks = []
+    for plaintext_block in split_blocks(plaintext, require_padding=False):
+        ciphertext_block = aes_.encrypt_block(plaintext)
+        blocks.append(ciphertext_block)
+        prev_ciphertext = ciphertext_block
+
+    return b''.join(blocks)
+
 def decrypt_cfb(aes_, ciphertext, iv):
     blocks = []
     prev_ciphertext = iv
     for ciphertext_block in split_blocks(ciphertext, require_padding=False):
-        # CFB mode decrypt: ciphertext XOR decrypt(prev_ciphertext)
         plaintext_block = xor_bytes(ciphertext_block, aes_.encrypt_block(prev_ciphertext))
+        blocks.append(plaintext_block)
+        prev_ciphertext = ciphertext_block
+
+    return b''.join(blocks)
+
+def decrypt_ecb(aes_, ciphertext):
+    blocks = []
+    for ciphertext_block in split_blocks(ciphertext, require_padding=False):
+        # plaintext_block = aes_.encrypt_block(ciphertext)
+        plaintext_block = aes_.decrypt_block(ciphertext)
         blocks.append(plaintext_block)
         prev_ciphertext = ciphertext_block
 

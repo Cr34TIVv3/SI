@@ -53,9 +53,8 @@ def main():
 
     # receive messages from A and send it to B
     while True:
-        message_for_b = client_a.recv(16)
+        message_for_b = client_a.recv(32)
         client_b.send(message_for_b)
-
 
     client_a.close()
     client_b.close()

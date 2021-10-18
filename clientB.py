@@ -36,11 +36,16 @@ s.send("Hello from Narnia".encode())
 
 # receive messages from A 
 while True:  
-    message_from_a = s.recv(16)
-
+    message_from_a = s.recv(32)
     aes = AES(dec_key)
-    decoded_message = crypto.decrypt_cfb(aes, message_from_a, initialization_vector)
-    print(f'Decoded block: {decoded_message}')
+    if message == 'ECB':
+        decoded_message = crypto.decrypt_ecb(aes, message_from_a)
+        print(f'Decoded block: {decoded_message}')
+    else:
+        decoded_message = crypto.decrypt_cfb(aes, message_from_a, initialization_vector)
+        print(f'Decoded block: {decoded_message}')
+
+    
 
      
 

@@ -268,39 +268,6 @@ class AES:
         return matrix2bytes(cipher_state)
 
 
-    def encrypt_cfb(self, plaintext, iv):
-        """
-        Encrypts `plaintext` with the given initialization vector (iv).
-        """
-        assert len(iv) == 16
-
-        blocks = []
-        prev_ciphertext = iv
-        for plaintext_block in split_blocks(plaintext, require_padding=False):
-            # CFB mode encrypt: plaintext_block XOR encrypt(prev_ciphertext)
-            ciphertext_block = xor_bytes(plaintext_block, self.encrypt_block(prev_ciphertext))
-            blocks.append(ciphertext_block)
-            prev_ciphertext = ciphertext_block
-
-        return b''.join(blocks)
-
-    def decrypt_cfb(self, ciphertext, iv):
-        """
-        Decrypts `ciphertext` with the given initialization vector (iv).
-        """
-        assert len(iv) == 16
-
-        blocks = []
-        prev_ciphertext = iv
-        for ciphertext_block in split_blocks(ciphertext, require_padding=False):
-            # CFB mode decrypt: ciphertext XOR decrypt(prev_ciphertext)
-            plaintext_block = xor_bytes(ciphertext_block, self.encrypt_block(prev_ciphertext))
-            blocks.append(plaintext_block)
-            prev_ciphertext = ciphertext_block
-
-        return b''.join(blocks)
-
-
 
 import os
 from hashlib import pbkdf2_hmac
@@ -382,30 +349,3 @@ def benchmark():
         aes.encrypt_block(message)
 
 __all__ = [encrypt, decrypt, AES]
-
-# if __name__ == '__main__':
-#     import sys
-#     write = lambda b: sys.stdout.buffer.write(b)
-#     read = lambda: sys.stdin.buffer.read()
-
-#     if len(sys.argv) < 2:
-#         print('Usage: ./aes.py encrypt "key" "message"')
-#         print('Running tests...')
-#         from tests import *
-#         run()
-#     elif len(sys.argv) == 2 and sys.argv[1] == 'benchmark':
-#         benchmark()
-#         exit()
-#     elif len(sys.argv) == 3:
-#         text = read()
-#     elif len(sys.argv) > 3:
-#         text = ' '.join(sys.argv[2:])
-
-#     if 'encrypt'.startswith(sys.argv[1]):
-#         write(encrypt(sys.argv[2], text))
-#     elif 'decrypt'.startswith(sys.argv[1]):
-#         write(decrypt(sys.argv[2], text))
-#     else:
-#         print('Expected command "encrypt" or "decrypt" in first argument.')
-
-    # encrypt('my secret key', b'0' * 1000000) # 1 MB encrypted in 20 seconds.
