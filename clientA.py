@@ -39,7 +39,7 @@ def main():
     print(s.recv(1024).decode())
 
     # send file to B either in ECB or CFB mode
-    with open("secret.txt", "r") as f:
+    with open("text.txt", "r") as f:
         message = f.read(1024)
         aes = AES(dec_key)
         # blocks = [message[i:i+64] for i in range(0, len(message), 16)]
@@ -50,7 +50,7 @@ def main():
                 s.send(encrypted_block)
                 print(f'(ECB) Message sent: {encrypted_block}')
         else: # CFB
-            blocks = [message[i:i+128] for i in range(0, len(message), 128)]
+            blocks = [message[i:i+32] for i in range(0, len(message), 32)]
             for block in blocks:
                 encrypted_message = crypto.encrypt_cfb(aes, bytes(block, 'utf-8'), initialization_vector)
                 s.send(encrypted_message)
